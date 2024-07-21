@@ -1,5 +1,11 @@
 import pg from 'pg';
-const {Client,Pool} = pg;
+const {Pool} = pg;
 
-const client = new Client();
+const pool = new Pool(({
+    // user: 
+    // password:
+    // host:
+    // port:
+    // database:
+}))
 
