@@ -1,0 +1,28 @@
+// configuration for passport
+import { Strategy, ExtractJwt } from "passport-jwt";
+import { configDotenv } from "dotenv";
+import passport from "passport";
+import { getUserById } from "./controllers/usersController";
+configDotenv();
+
+const opts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET,
+};
+
+passport.use(
+  new Strategy(opts, async (jwt_payload, done) => {
+    // get user from the database
+    try {
+      const user = await getUserById(jwt_payload.id);
+      if (!user) {
+        return done(null, false);
+      }
+      return done(null, user);
+    } catch (err) {
+      return done(err, false);
+    }
+  })
+);
+
+export default passportConfig;
