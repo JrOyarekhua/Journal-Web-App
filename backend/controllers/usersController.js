@@ -3,6 +3,8 @@
 import { getUserById } from "../models/usersModel";
 import jwt from "jsonwebtoken";
 import { configDotenv } from "dotenv";
+import bcrypt from "bcrypt";
+configDotenv();
 // authenticate user
 export const authenticateUser = async (req, res) => {
   // get the email and password from the client
@@ -32,7 +34,7 @@ export const authenticateUser = async (req, res) => {
       { expiresIn: "7d" }
     );
     // send tokens back to the user
-    res
+    return res
       .status(200)
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -41,10 +43,64 @@ export const authenticateUser = async (req, res) => {
       })
       .json(accessToken);
   } catch (err) {
-    res.status(500).json({ message: "internal server error", error: err });
+    return res
+      .status(500)
+      .json({ message: "internal server error", error: err });
   }
 };
-//
-export const getNewToken = async (req, res) => {
-  //
+// get new access token
+export const getNewAccessToken = async (req, res) => {
+  // get the info from the requset body
+  const { user } = req.body;
+  if (!user) {
+    res.status(404).json({ message: "user not found" });
+  }
+  //   issue a new jwt
+  try {
+    const newAccessToken = jwt.sign(user, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+    return res.status(200).json({ accessToken: newAccessToken });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "internal server error", error: error });
+  }
 };
+
+// create a new user
+export const createNewUser = async (req, res) => {
+  // get the info from the request body
+  const { email, password, first_name, last_name } = req.body;
+  if (!email || !password || !first_name || !last_name) {
+    return res.status(404).json({ message: "insufficient information" });
+  }
+  //   validate email
+  const isValidEmail = await validateEmail(email);
+  if (!isValidEmail) {
+    return res.status(400).json({ message: "invalid email" });
+  }
+
+  //  hashpassword
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  try {
+    const result = await db.query(
+      "INSERT INTO users (email,password,first_name,last_name) VALUES($1,$2,$3,$4);",
+      [email, hashedPassword, first_name, last_name]
+    );
+  } catch (err) {
+    // catch errors from the
+    return res
+      .status(500)
+      .send({ message: "internal server error", error: err.message });
+  }
+};
+
+// get user from database
+export const getUserInfo = async (req, res) => {};
+
+// delete user from the database
+export const deleteUser = async (req, res) => {};
+
+//

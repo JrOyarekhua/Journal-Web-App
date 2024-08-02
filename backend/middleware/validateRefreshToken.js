@@ -12,7 +12,10 @@ const validateRefreshToken = (req, res, next) => {
     if (err) {
       res.status(403).json({ message: "invalid refresh token" });
     }
+    // attach the payload to the request object
     req.user = decoded;
     next();
   });
 };
+
+export default validateRefreshToken;
