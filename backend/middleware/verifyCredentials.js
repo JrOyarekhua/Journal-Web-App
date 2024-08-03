@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { getUserByEmail, getUserbyUsername } from "../models/usersModel";
 export const verifyCredentials = async (req, res, next) => {
   //   get info from the body
   const { username, password, email } = req.body;

@@ -1,6 +1,15 @@
 // users server logic goes here
 
-import { getUserById } from "../models/usersModel";
+import {
+  getUserById,
+  insertNewEmail,
+  insertNewFirstName,
+  insertNewLastName,
+  insertNewUser,
+  insertNewUsername,
+  validateEmail,
+  validateUsername,
+} from "../models/usersModel";
 import jwt from "jsonwebtoken";
 import { configDotenv } from "dotenv";
 import bcrypt from "bcrypt";
@@ -86,8 +95,8 @@ export const createNewUser = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    await insertNewUser(email, hashedPassword, first_name, last_name);
-    return res.status(200).json("user succesfully inserted");
+    await insertNewUser(email, username, hashedPassword, first_name, last_name);
+    return res.status(200).json({ message: "user successfully created" });
   } catch (err) {
     // catch errors from the
     return res
@@ -135,21 +144,21 @@ export const deleteUser = async (req, res) => {
 //updete email
 export const updateEmail = async (req, res) => {
   const { newEmail } = req.body;
-  const { id } = req.params;
+  const { userId } = req.params;
   if (!newEmail) {
     return res.status(400).json({ message: "new email required" });
   }
 
   try {
-    const isValidId = await validateId(id);
-    if (!isValidId) {
-      return res.status(404).json({ message: "invalid user ID" });
+    const user = await getUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "user not found with ID" });
     }
     const isValidEmail = await validateEmail(newEmail);
     if (!isValidEmail) {
       return res.status(400).json({ message: "email already in use" });
     }
-    await insertNewEmail(newEmail, id);
+    await insertNewEmail(newEmail, userId);
     res.status(200).json({ message: "email succesfully changed" });
   } catch (err) {
     return res.status(500).json({ message: "internal server error" });
@@ -159,21 +168,21 @@ export const updateEmail = async (req, res) => {
 // update username
 export const updateUsername = async (req, res) => {
   const { newUsername } = req.body;
-  const { id } = req.params;
+  const { userId } = req.params;
   if (!newUsername) {
     return res.status(400).json({ message: "new username required" });
   }
 
   try {
-    const isValidId = await validateId(id);
-    if (!isValidId) {
-      return res.status(404).json({ message: "invalid user ID" });
+    const user = await getUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "user not found with ID" });
     }
-    const isValidUsername = await validateEmail(newUsername);
+    const isValidUsername = await validateUsername(newUsername);
     if (!isValidUsername) {
       return res.status(400).json({ message: "username is already in use" });
     }
-    await insertNewUsername(newUsername, id);
+    await insertNewUsername(newUsername, userId);
     res.status(200).json({ message: "username succesfully changed" });
   } catch (error) {
     return res
@@ -184,27 +193,31 @@ export const updateUsername = async (req, res) => {
 
 // update password
 export const updatePassword = async (req, res) => {
-  const { id } = req.params;
+  const { userId } = req.params;
   const { newPassword } = req.body;
   try {
-    await insertNewPassword(user_id, newPassword);
+    await insertNewPassword(userId, newPassword);
     return res.status(200).json({ message: "password succesfully changed" });
-  } catch (error) {}
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "internal server error", error: error.message });
+  }
 };
 
 export const updateFirstName = async (req, res) => {
   const { newFirstName } = req.body;
-  const { id } = req.params;
+  const { userId } = req.params;
   if (!newFirstName) {
     return res.status(400).json({ message: "new first name is required" });
   }
 
   try {
-    const isValidId = await validateId(id);
-    if (!isValidId) {
-      return res.status(404).json({ message: "invalid user ID" });
+    const user = await getUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "user not found with ID" });
     }
-    await insertNewFirstName(newFirstName, id);
+    await insertNewFirstName(newFirstName, userId);
     res.status(200).json({ message: "first name succesfully changed" });
   } catch (error) {
     return res
@@ -215,17 +228,17 @@ export const updateFirstName = async (req, res) => {
 
 export const updateLastName = async (req, res) => {
   const { newLastName } = req.body;
-  const { id } = req.params;
+  const { userId } = req.params;
   if (!newLastName) {
     return res.status(400).json({ message: "new last name is required" });
   }
 
   try {
-    const isValidId = await validateId(id);
-    if (!isValidId) {
-      return res.status(404).json({ message: "invalid user ID" });
+    const user = await getUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "user not found with ID" });
     }
-    await insertNewLirstName(newLastName, id);
+    await insertNewLastName(newLastName, id);
     res.status(200).json({ message: "last name succesfully changed" });
   } catch (error) {
     return res
