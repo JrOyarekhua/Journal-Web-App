@@ -5,3 +5,9 @@ export const getUserById = async (user_id) => {
   ]);
   return result.rows[0];
 };
+
+export const getUserByEmail = (email) => {};
+
+export const getUserbyUsername = (username) => {};
+
+const validateUsername = (username) => {};

@@ -7,29 +7,19 @@ import bcrypt from "bcrypt";
 configDotenv();
 // authenticate user
 export const authenticateUser = async (req, res) => {
-  // get the email and password from the client
-  const { email, password } = req.body;
+  //   get info from the user object
+  const { username, email, user_id } = req.user;
 
-  // validate the email and the password
   try {
-    const user = await getUserById(email);
-    if (!user) {
-      return res.status(404).json({ message: "invalid email" });
-    }
-    const isValidPassword = await validatePassword(password);
-    if (!isValidPassword) {
-      return res.status(401).json({ message: "invalid password" });
-    }
-
     // sign both the access and refresh token
     const accessToken = jwt.sign(
-      { user_id: user.user_id, email: user.email },
+      { user_id: user_id, email: email, username: username },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
 
     const refreshToken = jwt.sign(
-      { user_id: user.user_id, email: user.email },
+      { user_id: user_id, email: email, username: username },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -55,24 +45,29 @@ export const getNewAccessToken = async (req, res) => {
   if (!user) {
     res.status(404).json({ message: "user not found" });
   }
+  const { password, ...userWithoutPassword } = user;
   //   issue a new jwt
   try {
-    const newAccessToken = jwt.sign(user, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const newAccessToken = jwt.sign(
+      userWithoutPassword,
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
     return res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "internal server error", error: error });
+      .json({ message: "internal server error", error: error.message });
   }
 };
 
 // create a new user
 export const createNewUser = async (req, res) => {
   // get the info from the request body
-  const { email, password, first_name, last_name } = req.body;
-  if (!email || !password || !first_name || !last_name) {
+  const { email, password, first_name, last_name, username } = req.body;
+  if (!email || !password || !first_name || !last_name || !username) {
     return res.status(404).json({ message: "insufficient information" });
   }
   //   validate email
@@ -81,14 +76,18 @@ export const createNewUser = async (req, res) => {
     return res.status(400).json({ message: "invalid email" });
   }
 
+  //   validate username
+  const isValidUsername = await validateUsername(username);
+  if (!isValidUsername) {
+    return res.status(400).json({ message: "invalid username" });
+  }
+
   //  hashpassword
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const result = await db.query(
-      "INSERT INTO users (email,password,first_name,last_name) VALUES($1,$2,$3,$4);",
-      [email, hashedPassword, first_name, last_name]
-    );
+    await insertNewUser(email, hashedPassword, first_name, last_name);
+    return res.status(200).json("user succesfully inserted");
   } catch (err) {
     // catch errors from the
     return res
@@ -98,9 +97,139 @@ export const createNewUser = async (req, res) => {
 };
 
 // get user from database
-export const getUserInfo = async (req, res) => {};
+export const getUserInfo = async (req, res) => {
+  const { user_id } = req.body;
+  try {
+    if (!user_id) {
+      return res.status(400).json({ message: "user ID required" });
+    }
+    const user = await getUserById(user_id);
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+    const { password, ...userWithoutPassword } = user;
+    return res.status(200).json(userWithoutPassword);
+  } catch (err) {
+    return res.status(500).json({ message: "internal server error" });
+  }
+};
 
 // delete user from the database
-export const deleteUser = async (req, res) => {};
+export const deleteUser = async (req, res) => {
+  const { user_id } = req.body;
+  if (!user_id) {
+    return res.status(404).json({ message: "user ID required" });
+  }
+  try {
+    const user = await getUserById(user_id);
+    if (!user) {
+      return res.status(404).json({ message: "user not found" });
+    }
+    await deleteUser(user_id);
+    return res.status(200).json({ message: "user succesfully deleted" });
+  } catch (err) {
+    return res.status(500).json({ message: "internal server error" });
+  }
+};
 
-//
+//updete email
+export const updateEmail = async (req, res) => {
+  const { newEmail } = req.body;
+  const { id } = req.params;
+  if (!newEmail) {
+    return res.status(400).json({ message: "new email required" });
+  }
+
+  try {
+    const isValidId = await validateId(id);
+    if (!isValidId) {
+      return res.status(404).json({ message: "invalid user ID" });
+    }
+    const isValidEmail = await validateEmail(newEmail);
+    if (!isValidEmail) {
+      return res.status(400).json({ message: "email already in use" });
+    }
+    await insertNewEmail(newEmail, id);
+    res.status(200).json({ message: "email succesfully changed" });
+  } catch (err) {
+    return res.status(500).json({ message: "internal server error" });
+  }
+};
+
+// update username
+export const updateUsername = async (req, res) => {
+  const { newUsername } = req.body;
+  const { id } = req.params;
+  if (!newUsername) {
+    return res.status(400).json({ message: "new username required" });
+  }
+
+  try {
+    const isValidId = await validateId(id);
+    if (!isValidId) {
+      return res.status(404).json({ message: "invalid user ID" });
+    }
+    const isValidUsername = await validateEmail(newUsername);
+    if (!isValidUsername) {
+      return res.status(400).json({ message: "username is already in use" });
+    }
+    await insertNewUsername(newUsername, id);
+    res.status(200).json({ message: "username succesfully changed" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "internal server error", error: error.message });
+  }
+};
+
+// update password
+export const updatePassword = async (req, res) => {
+  const { id } = req.params;
+  const { newPassword } = req.body;
+  try {
+    await insertNewPassword(user_id, newPassword);
+    return res.status(200).json({ message: "password succesfully changed" });
+  } catch (error) {}
+};
+
+export const updateFirstName = async (req, res) => {
+  const { newFirstName } = req.body;
+  const { id } = req.params;
+  if (!newFirstName) {
+    return res.status(400).json({ message: "new first name is required" });
+  }
+
+  try {
+    const isValidId = await validateId(id);
+    if (!isValidId) {
+      return res.status(404).json({ message: "invalid user ID" });
+    }
+    await insertNewFirstName(newFirstName, id);
+    res.status(200).json({ message: "first name succesfully changed" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "internal server error", error: error.message });
+  }
+};
+
+export const updateLastName = async (req, res) => {
+  const { newLastName } = req.body;
+  const { id } = req.params;
+  if (!newLastName) {
+    return res.status(400).json({ message: "new last name is required" });
+  }
+
+  try {
+    const isValidId = await validateId(id);
+    if (!isValidId) {
+      return res.status(404).json({ message: "invalid user ID" });
+    }
+    await insertNewLirstName(newLastName, id);
+    res.status(200).json({ message: "last name succesfully changed" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "internal server error", error: error.message });
+  }
+};

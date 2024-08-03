@@ -5,7 +5,7 @@ const validateRefreshToken = (req, res, next) => {
   // get the refresh token from cookie
   const { refreshToken } = req.cookie;
   if (!refreshToken) {
-    return res.status(404).json({ message: "missing refresh tokan" });
+    return res.status(404).json({ message: "missing refresh token" });
   }
   //   validate the refresh token
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
