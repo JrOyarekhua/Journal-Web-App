@@ -64,6 +64,19 @@ export const validateUsername = async (username) => {
   }
 };
 
+export const validateId = async (user_id) => {
+  try {
+    const result = await db.query("SELECT * FROM users WHERE user_id=$1", [
+      user_id,
+    ]);
+    return result.rowCount > 0;
+  } catch (error) {
+    throw new Error(
+      "error selecting content from the database: " + error.message
+    );
+  }
+};
+
 export const insertNewUser = async (
   email,
   username,

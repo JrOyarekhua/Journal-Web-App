@@ -2,13 +2,13 @@ import bcrypt from "bcrypt";
 import { getUserById } from "../models/usersModel";
 
 export const verifyOldPassword = async (req, res, next) => {
-  const { id } = req.params;
+  const { userId } = req.params;
   const { oldPassword } = req.body;
   if (!oldPassword) {
     return res.status(404).json({ message: "old password is required" });
   }
   try {
-    const user = await getUserById(id);
+    const user = await getUserById(userId);
     if (!user) {
       return res.status(404).json({ message: "user not found with this ID" });
     }
