@@ -1,5 +1,4 @@
-const express = require("express");
-const router = express.Router();
+import express from "express";
 import passport from "passport";
 import "../passportConfig.js";
 import validateRefreshToken from "../middleware/validateRefreshToken.js";
@@ -15,8 +14,9 @@ import {
   updateFirstName,
   updateLastName,
 } from "../controllers/usersController.js";
-import { verifyCredentials } from "../middleware/verifyCredentials.js";
 import verifyOldPassword from "../middleware/veriftOldPassword.js";
+import verifyCredentials from "../middleware/verifyCredentials.js";
+const router = express.Router();
 
 router.post("/auth", verifyCredentials, authenticateUser);
 
@@ -31,4 +31,4 @@ router.put("/:id/first-name", updateFirstName);
 router.put("/:id/last-name", updateLastName);
 router.post("/refresh-token", validateRefreshToken, getNewAccessToken);
 
-export default usersRouter;
+export default router;

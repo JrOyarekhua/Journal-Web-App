@@ -106,5 +106,3 @@ export const updateContentById = async (note_id, newContent) => {
     throw new Error("error updating title " + error.message);
   }
 };
-
-export default notesModel;

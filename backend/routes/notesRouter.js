@@ -25,4 +25,4 @@ router.put("/:noteId/title", updateTitle);
 
 router.put("/:noteid/content", updateContent);
 
-export default notesRouter;
+export default router;

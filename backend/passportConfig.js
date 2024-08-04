@@ -25,4 +25,4 @@ passport.use(
   })
 );
 
-export default passportConfig;
+export default passport;

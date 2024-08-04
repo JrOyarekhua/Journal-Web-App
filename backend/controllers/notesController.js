@@ -113,5 +113,3 @@ export const updateContent = async (req, res) => {
       .json({ message: "internal server error", error: error.message });
   }
 };
-
-export default notesController;

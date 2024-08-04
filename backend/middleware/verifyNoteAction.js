@@ -1,6 +1,6 @@
 import { getUserById } from "../models/usersModel.js";
 
-export const verifyNoteAction = async (req, res, next) => {
+const verifyNoteAction = async (req, res, next) => {
   const { userId, noteId } = req.params;
   try {
     const user = await getUserById(userId);

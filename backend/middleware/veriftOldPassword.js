@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { getUserById } from "../models/usersModel.js";
 
-export const verifyOldPassword = async (req, res, next) => {
+const verifyOldPassword = async (req, res, next) => {
   const { userId } = req.params;
   const { oldPassword } = req.body;
   if (!oldPassword) {

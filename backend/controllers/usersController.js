@@ -246,5 +246,3 @@ export const updateLastName = async (req, res) => {
       .json({ message: "internal server error", error: error.message });
   }
 };
-
-export default usersController;
