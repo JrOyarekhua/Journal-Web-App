@@ -2,7 +2,7 @@
 import { Strategy, ExtractJwt } from "passport-jwt";
 import { configDotenv } from "dotenv";
 import passport from "passport";
-import { getUserById } from "./controllers/usersController";
+import { getUserById } from "./models/usersModel.js";
 configDotenv();
 
 const opts = {

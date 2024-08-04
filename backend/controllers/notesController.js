@@ -1,11 +1,12 @@
 import {
   deleteNoteById,
   getNoteById,
+  getNotesFromDB,
   insertNewNote,
   updateContentById,
   updateTitleById,
-} from "../models/notesModel";
-import { getUserById } from "../models/usersModel";
+} from "../models/notesModel.js";
+import { getUserById } from "../models/usersModel.js";
 
 // get all notes belonging to a specific user
 export const getAllNotes = async (req, res) => {
@@ -112,3 +113,5 @@ export const updateContent = async (req, res) => {
       .json({ message: "internal server error", error: error.message });
   }
 };
+
+export default notesController;

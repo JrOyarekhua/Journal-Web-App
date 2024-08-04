@@ -1,3 +1,5 @@
+import { getUserById } from "../models/usersModel.js";
+
 export const verifyNoteAction = async (req, res, next) => {
   const { userId, noteId } = req.params;
   try {
@@ -21,3 +23,5 @@ export const verifyNoteAction = async (req, res, next) => {
       .json({ message: "internal server error", error: error.message });
   }
 };
+
+export default verifyNoteAction;

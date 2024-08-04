@@ -9,7 +9,7 @@ import {
   insertNewUsername,
   validateEmail,
   validateUsername,
-} from "../models/usersModel";
+} from "../models/usersModel.js";
 import jwt from "jsonwebtoken";
 import { configDotenv } from "dotenv";
 import bcrypt from "bcrypt";
@@ -246,3 +246,5 @@ export const updateLastName = async (req, res) => {
       .json({ message: "internal server error", error: error.message });
   }
 };
+
+export default usersController;

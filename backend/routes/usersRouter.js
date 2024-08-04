@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 import passport from "passport";
-import passportConfig from "../passportConfig.js";
+import "../passportConfig.js";
 import validateRefreshToken from "../middleware/validateRefreshToken.js";
 import {
   authenticateUser,
@@ -31,4 +31,4 @@ router.put("/:id/first-name", updateFirstName);
 router.put("/:id/last-name", updateLastName);
 router.post("/refresh-token", validateRefreshToken, getNewAccessToken);
 
-module.exports = router;
+export default usersRouter;

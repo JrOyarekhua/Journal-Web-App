@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { getUserById } from "../models/usersModel";
+import { getUserById } from "../models/usersModel.js";
 
 export const verifyOldPassword = async (req, res, next) => {
   const { userId } = req.params;

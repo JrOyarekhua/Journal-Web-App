@@ -45,16 +45,66 @@ export const getNotesFromDB = async (
 };
 
 // get a single note from the DB
-export const getNoteById = async (note_id) => {};
+export const getNoteById = async (note_id) => {
+  try {
+    const result = await db.query(
+      "SELECT * FROM notes WHERE note_id=$1",
+      note_id
+    );
+    return result.rows[0];
+  } catch (error) {
+    throw new Error("error retriving note: " + error.message);
+  }
+};
 
 // create a new note
-export const insertNewNote = async (user_id, note, content) => {};
+export const insertNewNote = async (user_id, title, content) => {
+  try {
+    const result = await db.query(
+      "INSERT INTO notes (title,content,user_id) VALUES ($1,$2,$3);",
+      [title, content, user_id]
+    );
+    return result.rows[0];
+  } catch (error) {
+    throw new Error("error inserting note: " + error.message);
+  }
+};
 
 // delete a note
-export const deleteNoteById = async (user_id, note_id) => {};
+export const deleteNoteById = async (user_id, note_id) => {
+  try {
+    await db.query("DELETE FROM notes WHERE note_id=$1 and user_id=$2", [
+      note_id,
+      user_id,
+    ]);
+    return;
+  } catch (error) {
+    throw new Error("error deleting note " + error.message);
+  }
+};
 
 // update title
-export const updateTitleById = async (note_id, newTitle) => {};
+export const updateTitleById = async (note_id, newTitle) => {
+  try {
+    await db.query("UPDATE users SET title=$1 WHERE note_id=$2", [
+      newTitle,
+      note_id,
+    ]);
+  } catch (error) {
+    throw new Error("error updating title " + error.message);
+  }
+};
 
 // update content
-export const updateContentById = (note_id, newContent) => {};
+export const updateContentById = async (note_id, newContent) => {
+  try {
+    await db.query("UPDATE users SET content=$1 WHERE note_id=$2", [
+      newContent,
+      note_id,
+    ]);
+  } catch (error) {
+    throw new Error("error updating title " + error.message);
+  }
+};
+
+export default notesModel;

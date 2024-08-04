@@ -1,9 +1,9 @@
 import express from "express";
-import userRouter from "./routes/users";
-import notesRouter from "./routes/notes";
+import userRouter from "./routes/usersRouter.js";
+import notesRouter from "./routes/notesRouter.js";
 import passport from "passport";
 import cookieParser from "cookie-parser";
-import passportConfig from "./passportConfig";
+import "./passportConfig.js";
 const app = express();
 
 app.use(express.json());

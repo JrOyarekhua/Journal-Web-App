@@ -158,3 +158,5 @@ export const insertNewLastName = async (newLastName, user_id) => {
     throw new Error("error updating password: " + error.message);
   }
 };
+
+export default usersModel;

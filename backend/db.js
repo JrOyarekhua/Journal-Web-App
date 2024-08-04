@@ -20,4 +20,4 @@ const test = async () => {
   }
 };
 
-export default db;
+export default pool;
