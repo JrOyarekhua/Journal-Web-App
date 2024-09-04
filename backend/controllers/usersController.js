@@ -38,13 +38,14 @@ export const authenticateUser = async (req, res) => {
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? true : "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
-      .json(accessToken);
+      .json({ message: "sign in successful", accessToken: accessToken });
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "internal server error", error: err });
+      .json({ message: "internal server error", error: err.message });
   }
 };
 // get new access token
@@ -61,7 +62,7 @@ export const getNewAccessToken = async (req, res) => {
       userWithoutPassword,
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "2h",
       }
     );
     return res.status(200).json({ accessToken: newAccessToken });
@@ -79,6 +80,7 @@ export const createNewUser = async (req, res) => {
   if (!email || !password || !first_name || !last_name || !username) {
     return res.status(404).json({ message: "insufficient information" });
   }
+  console.log(req.body);
   //   validate email
   const isValidEmail = await validateEmail(email);
   if (!isValidEmail) {
@@ -94,9 +96,34 @@ export const createNewUser = async (req, res) => {
   //  hashpassword
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  console.log(hashedPassword);
   try {
-    await insertNewUser(email, username, hashedPassword, first_name, last_name);
-    return res.status(200).json({ message: "user successfully created" });
+    const newUser = await insertNewUser(
+      email,
+      username,
+      hashedPassword,
+      first_name,
+      last_name
+    );
+
+    const { password, ...userWithoutPassword } = newUser;
+    const accessToken = jwt.sign(userWithoutPassword, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
+    const refreshToken = jwt.sign(
+      userWithoutPassword,
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "7d" }
+    );
+    return res
+      .status(200)
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? true : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .json({ message: "user successfully created", accessToken: accessToken });
   } catch (err) {
     // catch errors from the
     return res

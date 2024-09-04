@@ -1,11 +1,19 @@
-import Hero from "./pages/hero/Hero.jsx";
-
+import Home from "./pages/home/Home";
+import { Route, Routes } from "react-router-dom";
+import SignUp from "./pages/home/SignUp";
+import LogIn from "./pages/home/LogIn";
+import Dashboard from "./pages/dashboard/Dashboard";
+import Note from "./pages/dashboard/Note";
 function App() {
-  // return <Hero />;
   return (
-    <div className=" bg-black text-white h-screen w-10">
-      <p>THIS IS A TEST</p>
-    </div>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/register" element={<SignUp />} />
+      <Route path="/auth" element={<LogIn />} />
+      <Route path="/dashboard" element={<Dashboard />}>
+        <Route path="note/:id?" element={<Note />} />
+      </Route>
+    </Routes>
   );
 }
 

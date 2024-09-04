@@ -43,7 +43,7 @@ export const validateEmail = async (email) => {
     const result = await db.query("SELECT * FROM users WHERE email=$1", [
       email,
     ]);
-    return result.rowCount > 0;
+    return result.rowCount === 0;
   } catch (error) {
     throw new Error(
       "error selecting content from the database: " + error.message
@@ -56,7 +56,7 @@ export const validateUsername = async (username) => {
     const result = await db.query("SELECT * FROM users WHERE username=$1", [
       username,
     ]);
-    return result.rowCount > 0;
+    return result.rowCount === 0;
   } catch (error) {
     throw new Error(
       "error selecting content from the database: " + error.message
@@ -69,7 +69,7 @@ export const validateId = async (user_id) => {
     const result = await db.query("SELECT * FROM users WHERE user_id=$1", [
       user_id,
     ]);
-    return result.rowCount > 0;
+    return result.rowCount === 0;
   } catch (error) {
     throw new Error(
       "error selecting content from the database: " + error.message
@@ -85,10 +85,11 @@ export const insertNewUser = async (
   last_name
 ) => {
   try {
-    await db.query(
-      "INSERT INTO users (email,username,first_name,last_name,password) VALUES ($1,$2,$3,$4,$5)",
-      [email, username, password, first_name, last_name]
+    const result = await db.query(
+      "INSERT INTO users (email,username,first_name,last_name,password) VALUES ($1,$2,$3,$4,$5) RETURNING *;",
+      [email, username, first_name, last_name, password]
     );
+    return result.rows[0];
   } catch (error) {
     throw new Error(
       "error inserting new user into the database: " + error.message

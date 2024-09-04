@@ -12,8 +12,6 @@ import verifyNoteAction from "../middleware/verifyNoteAction.js";
 
 const router = express.Router();
 
-router.use(passport.authenticate({ session: false }));
-
 router.post("/new", createNote);
 
 router.get("/", getAllNotes);

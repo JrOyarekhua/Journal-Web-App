@@ -18,11 +18,15 @@ import verifyOldPassword from "../middleware/veriftOldPassword.js";
 import verifyCredentials from "../middleware/verifyCredentials.js";
 const router = express.Router();
 
+router.get("/", (req, res) => {
+  res.status(200).json({ message: "route is hit" });
+});
+
 router.post("/auth", verifyCredentials, authenticateUser);
 
 router.post("/register", createNewUser);
 
-router.use(passport.authenticate(("jwt", { session: false })));
+router.use(passport.authenticate("jwt", { session: false }));
 router.route("/:id").get(getUserInfo).delete(deleteUser);
 router.put("/:id/email", updateEmail);
 router.put("/:id/username", updateUsername);
