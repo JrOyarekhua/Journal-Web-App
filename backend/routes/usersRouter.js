@@ -13,6 +13,7 @@ import {
   updateEmail,
   updateFirstName,
   updateLastName,
+  logout,
 } from "../controllers/usersController.js";
 import verifyOldPassword from "../middleware/veriftOldPassword.js";
 import verifyCredentials from "../middleware/verifyCredentials.js";
@@ -25,6 +26,7 @@ router.get("/", (req, res) => {
 router.post("/auth", verifyCredentials, authenticateUser);
 
 router.post("/register", createNewUser);
+router.post("/logout", logout);
 
 router.use(passport.authenticate("jwt", { session: false }));
 router.route("/:id").get(getUserInfo).delete(deleteUser);

@@ -10,7 +10,7 @@ const validateRefreshToken = (req, res, next) => {
   //   validate the refresh token
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
     if (err) {
-      res.status(403).json({ message: "invalid refresh token" });
+      return res.status(403).json({ message: "invalid refresh token" });
     }
     // attach the payload to the request object
     req.user = decoded;

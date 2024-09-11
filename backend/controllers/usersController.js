@@ -53,7 +53,7 @@ export const getNewAccessToken = async (req, res) => {
   // get the info from the requset body
   const { user } = req.body;
   if (!user) {
-    res.status(404).json({ message: "user not found" });
+    return res.status(404).json({ message: "user not found" });
   }
   const { password, ...userWithoutPassword } = user;
   //   issue a new jwt
@@ -73,8 +73,22 @@ export const getNewAccessToken = async (req, res) => {
   }
 };
 
+export const logout = async (req, res) => {
+  if (!req.cookies.refreshToken) {
+    return res.status(400).json({ message: "no refresh token found" });
+  }
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? true : "lax",
+  });
+
+  return res.status(200).json({ message: "user succesfully logged out" });
+};
+
 // create a new user
 export const createNewUser = async (req, res) => {
+  console.log("route hit");
   // get the info from the request body
   const { email, password, first_name, last_name, username } = req.body;
   if (!email || !password || !first_name || !last_name || !username) {

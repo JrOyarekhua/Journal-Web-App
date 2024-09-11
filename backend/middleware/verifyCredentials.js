@@ -5,7 +5,7 @@ const verifyCredentials = async (req, res, next) => {
   const { username, password, email } = req.body;
   if ((!username && !email) || !password) {
     return res
-      .status(404)
+      .status(401)
       .json({ message: "username or email and password are required" });
   }
   try {
@@ -14,14 +14,14 @@ const verifyCredentials = async (req, res, next) => {
       user = await getUserByEmail(email);
       if (!user) {
         return res
-          .status(404)
+          .status(401)
           .json({ message: "user not found with this email" });
       }
     } else if (username) {
       user = await getUserbyUsername(username);
       if (!user) {
         return res
-          .status(404)
+          .status(401)
           .json({ message: "user not found with this password" });
       }
     }
