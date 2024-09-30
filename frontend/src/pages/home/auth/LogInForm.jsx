@@ -1,11 +1,11 @@
-import CardWrapper from "../homeComponents/CardWrapper";
+import CardWrapper from "../../CardWrapper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { LoginSchema } from "./Schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "./AuthProvider";
+import { AuthContext } from "../../../providers/AuthProvider";
 import {
   Form,
   FormControl,
@@ -39,7 +39,7 @@ const LogInForm = () => {
       // redirect to dashboard
       navigate("/dashboard");
     } catch (error) {
-      console.log(` ${errorMessage}`);
+      console.log(error);
     }
   }
 

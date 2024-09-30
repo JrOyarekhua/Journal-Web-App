@@ -10,18 +10,18 @@ export const RegisterSchema = z.object({
   lastName: z.string().min(2, {
     message: "last name must be at least 2 characters long",
   }),
-  username: z
-    .string()
-    .min(2, {
-      message: "username must be at least 2 characters long",
-    })
-    .max(20, {
-      message: "username must be at most 20 characters long",
-    })
-    .regex(
-      /^[a-zA-z][a-zA-z0-9_-]*/,
-      "username must start with a letter and must only contain letters, numbers, underscores, and hyphens"
-    ),
+  // username: z
+  //   .string()
+  //   .min(2, {
+  //     message: "username must be at least 2 characters long",
+  //   })
+  //   .max(20, {
+  //     message: "username must be at most 20 characters long",
+  //   })
+  //   .regex(
+  //     /^[a-zA-z][a-zA-z0-9_-]*/,
+  //     "username must start with a letter and must only contain letters, numbers, underscores, and hyphens"
+  //   ),
   password: z
     .string()
     .min(2, { message: "password must be at least 2 characters long" })

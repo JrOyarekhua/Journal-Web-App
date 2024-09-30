@@ -4,8 +4,8 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import AuthHeader from "./AuthHeader";
-import BackButton from "./BackButton";
+import AuthHeader from "./home/homeComponents/AuthHeader";
+import BackButton from "./home/homeComponents/BackButton";
 const CardWrapper = ({
   label,
   title,

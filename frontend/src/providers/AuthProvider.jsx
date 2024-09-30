@@ -2,15 +2,17 @@ import axios from "axios";
 import { useState, createContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
-const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
   // initialize state in order to store the access and refresh token
 
   const [accessToken, setAccessToken] = useState(
     localStorage.getItem("accessToken") || ""
   );
   const [errorMessage, setErrorMessage] = useState("");
+
+  const[user_id,setUserId] = useState(null)
   const navigate = useNavigate();
 
   let isRefreshing = false;
@@ -43,6 +45,9 @@ const AuthProvider = ({ children }) => {
         { withCredentials: true }
       );
       localStorage.setItem("accessToken", result.data.accessToken);
+      console.log(result.data)
+      setUserId(result.data.user_id)
+      console.log("user id stored")
       console.log("cookies and access token set");
       return;
     } catch (error) {
@@ -53,6 +58,7 @@ const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+
   // handle refresh token
 
   const logout = async () => {
@@ -63,7 +69,7 @@ const AuthProvider = ({ children }) => {
         { withCredentials: true }
       );
     } catch (error) {
-      console.log(error.response?.data?.message);
+      console.log(error);
     }
     setAccessToken(null);
     localStorage.removeItem("accessToken");
@@ -96,10 +102,12 @@ const AuthProvider = ({ children }) => {
           isRefreshing = true;
           try {
             const res = await axios.post(
-              "http://localhost:8080/api/users/refresh-token",
-              {},
-              { withCredentials: true }
+              "http://localhost:8080/api/users/refresh-token",{},
+              {withCredentials: true,
+                headers: `Bearer ${localStorage.getItem("accessToken")}`
+              }
             );
+            console.log("first response: " + res)
             const newAccessToken = res.accessToken;
             localStorage.setItem("accessToken", newAccessToken);
             setAccessToken(newAccessToken);
@@ -111,6 +119,7 @@ const AuthProvider = ({ children }) => {
 
             return axios(originalRequest);
           } catch (refreshError) {
+            console.log("refresh error" + refreshError)
             console.log("Failed to refresh token, logging out...");
             await logout();
             return Promise.reject(refreshError);
@@ -128,11 +137,12 @@ const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  
   return (
-    <AuthContext.Provider value={{ accessToken, login, logout, errorMessage }}>
+    <AuthContext.Provider value={{ accessToken, login, logout, errorMessage, user_id }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export { AuthProvider, AuthContext };
+

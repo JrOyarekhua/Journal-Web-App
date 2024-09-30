@@ -11,9 +11,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-const NoteWrapper = ({ title, date }) => {
+import { useNavigate } from "react-router-dom";
+const NoteWrapper = ({ title, date, noteId, handleDeleteClick }) => {
+  const navigate = useNavigate()
   return (
-    <Card className="flex flex-col items-start justify-center h-[75px] w-[700px] bg-[#1E1E1E] text-white pl-4 border-none mb-4">
+
+    <Card className="flex flex-col items-start justify-center h-[75px] w-[700px] bg-[#18181b] text-white pl-4 border-none mb-4">
       <CardTitle className="p-0 mt-8">{title || "untitled"}</CardTitle>
       <CardFooter className="flex p-0 justify-between w-full pb-4">
         <p className="text-xs">{date}</p>
@@ -26,9 +29,14 @@ const NoteWrapper = ({ title, date }) => {
           <DropdownMenuContent>
             <DropdownMenuLabel>Note options</DropdownMenuLabel>
             <DropdownMenuSeparator></DropdownMenuSeparator>
-            <DropdownMenuItem>edit note</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              alert(noteId)
+              navigate(`/note/:${noteId}`)
+            }}>edit note</DropdownMenuItem>
             <DropdownMenuSeparator></DropdownMenuSeparator>
-            <DropdownMenuItem>delete note</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              handleDeleteClick(noteId)
+            }}>delete note</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </CardFooter>

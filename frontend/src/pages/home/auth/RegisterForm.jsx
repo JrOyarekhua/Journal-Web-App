@@ -1,4 +1,4 @@
-import CardWrapper from "../homeComponents/CardWrapper";
+import CardWrapper from "../../CardWrapper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { RegisterSchema } from "./Schema";
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 
 import { Input } from "@/components/ui/input";
-import { AuthContext } from "./AuthProvider";
+import { AuthContext } from "../../../providers/AuthProvider";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -29,7 +29,6 @@ const RegisterForm = () => {
       email: "",
       firstName: "",
       lastName: "",
-      username: "",
       password: "",
       confirmPassword: "",
     },
@@ -42,7 +41,7 @@ const RegisterForm = () => {
       {
         first_name: data.firstName,
         last_name: data.lastName,
-        username: data.username,
+
         password: data.password,
         email: data.email,
       },
@@ -112,7 +111,7 @@ const RegisterForm = () => {
               );
             }}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
             name="username"
             render={({ field }) => {
@@ -126,7 +125,7 @@ const RegisterForm = () => {
                 </FormItem>
               );
             }}
-          />
+          /> */}
           <FormField
             control={form.control}
             name="password"
