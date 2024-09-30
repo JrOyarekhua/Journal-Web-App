@@ -2,7 +2,7 @@ import db from "../db.js";
 
 // get all notes from DB
 export const getNotesFromDB = async (
-  userId,
+  user_id,
   cursor,
   sortBy,
   sortOrder,
@@ -21,7 +21,10 @@ export const getNotesFromDB = async (
   }
   //   dynamically build query
   let query = "SELECT * FROM notes WHERE user_id=$1";
-  let params = [userId];
+  let params = [user_id]
+  console.log("user id: " + user_id)
+  
+  
 
   if (cursor) {
     query += ` AND created_at > $${params.length + 1}`;
@@ -29,12 +32,14 @@ export const getNotesFromDB = async (
   }
 
   if (sortBy) {
-    query += ` ORDER BY ${sortBy.toUpper()} ${sortOrder.toUpper()}`;
+    query += ` ORDER BY ${sortBy} ${sortOrder}`;
   }
 
   query += ` LIMIT $${params.length + 1}`;
   params.push(limit);
   try {
+    console.log("query: " + query)
+    console.log("params: " + params)
     const result = await db.query(query, params);
     return result.rows;
   } catch (error) {
@@ -46,11 +51,14 @@ export const getNotesFromDB = async (
 
 // get a single note from the DB
 export const getNoteById = async (note_id) => {
+  // let note_id = String(note_id)
+  console.log("attempting to get a single note with " + note_id.slice(1))
   try {
     const result = await db.query(
       "SELECT * FROM notes WHERE note_id=$1",
-      note_id
+      [note_id.slice(1)]
     );
+    
     return result.rows[0];
   } catch (error) {
     throw new Error("error retriving note: " + error.message);
@@ -71,11 +79,11 @@ export const insertNewNote = async (user_id, title, content) => {
 };
 
 // delete a note
-export const deleteNoteById = async (user_id, note_id) => {
+export const deleteNoteById = async (note_id) => {
+  console.log("NOTE ID PASSED INTO THE DELETE FUCNTION: " + note_id.slice(1) )
   try {
-    await db.query("DELETE FROM notes WHERE note_id=$1 and user_id=$2", [
-      note_id,
-      user_id,
+    await db.query("DELETE FROM notes WHERE note_id=$1", [
+      note_id.slice(1),
     ]);
     return;
   } catch (error) {
@@ -85,24 +93,26 @@ export const deleteNoteById = async (user_id, note_id) => {
 
 // update title
 export const updateTitleById = async (note_id, newTitle) => {
+  console.log('attempting to update title by note id...')
   try {
     await db.query("UPDATE users SET title=$1 WHERE note_id=$2", [
       newTitle,
-      note_id,
+      note_id.slice(1),
     ]);
   } catch (error) {
-    throw new Error("error updating title " + error.message);
+    throw new Error("error updating title " + error);
   }
 };
 
 // update content
 export const updateContentById = async (note_id, newContent) => {
+  console.log('attempting to update the content by note Id: ' + note_id.slice(1))
   try {
-    await db.query("UPDATE users SET content=$1 WHERE note_id=$2", [
+    await db.query("UPDATE notes SET content=$1 WHERE note_id=$2", [
       newContent,
-      note_id,
+      note_id.slice(1),
     ]);
   } catch (error) {
-    throw new Error("error updating title " + error.message);
+    throw new Error("error updating title " + error);
   }
 };

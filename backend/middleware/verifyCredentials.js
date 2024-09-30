@@ -1,12 +1,12 @@
 import bcrypt from "bcrypt";
-import { getUserByEmail, getUserbyUsername } from "../models/usersModel.js";
+import { getUserByEmail} from "../models/usersModel.js";
 const verifyCredentials = async (req, res, next) => {
   //   get info from the body
-  const { username, password, email } = req.body;
-  if ((!username && !email) || !password) {
+  const { password, email } = req.body;
+  if ( !email || !password) {
     return res
       .status(401)
-      .json({ message: "username or email and password are required" });
+      .json({ message: "email and password are required" });
   }
   try {
     let user;
@@ -17,14 +17,7 @@ const verifyCredentials = async (req, res, next) => {
           .status(401)
           .json({ message: "user not found with this email" });
       }
-    } else if (username) {
-      user = await getUserbyUsername(username);
-      if (!user) {
-        return res
-          .status(401)
-          .json({ message: "user not found with this password" });
-      }
-    }
+    } 
 
     // validate password
     const isValidPassword = await bcrypt.compare(password, user.password);

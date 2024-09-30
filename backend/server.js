@@ -19,7 +19,7 @@ app.use(
   })
 );
 app.use("/api/users", userRouter);
-app.use("/api/users/:id/notes", notesRouter);
+app.use("/api/notes", notesRouter);
 
 app.listen(8080, () => {
   console.log("server is listening on http://localhost:8080/");

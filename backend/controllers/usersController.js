@@ -41,7 +41,7 @@ export const authenticateUser = async (req, res) => {
         sameSite: process.env.NODE_ENV === "production" ? true : "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
-      .json({ message: "sign in successful", accessToken: accessToken });
+      .json({ message: "sign in successful", accessToken: accessToken, user_id: user_id });
   } catch (err) {
     return res
       .status(500)
@@ -52,6 +52,7 @@ export const authenticateUser = async (req, res) => {
 export const getNewAccessToken = async (req, res) => {
   // get the info from the requset body
   const { user } = req.body;
+  console.log(user)
   if (!user) {
     return res.status(404).json({ message: "user not found" });
   }
@@ -90,8 +91,8 @@ export const logout = async (req, res) => {
 export const createNewUser = async (req, res) => {
   console.log("route hit");
   // get the info from the request body
-  const { email, password, first_name, last_name, username } = req.body;
-  if (!email || !password || !first_name || !last_name || !username) {
+  const { email, password, first_name, last_name} = req.body;
+  if (!email || !password || !first_name || !last_name) {
     return res.status(404).json({ message: "insufficient information" });
   }
   console.log(req.body);
@@ -101,12 +102,7 @@ export const createNewUser = async (req, res) => {
     return res.status(400).json({ message: "invalid email" });
   }
 
-  //   validate username
-  const isValidUsername = await validateUsername(username);
-  if (!isValidUsername) {
-    return res.status(400).json({ message: "invalid username" });
-  }
-
+  
   //  hashpassword
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -114,7 +110,6 @@ export const createNewUser = async (req, res) => {
   try {
     const newUser = await insertNewUser(
       email,
-      username,
       hashedPassword,
       first_name,
       last_name

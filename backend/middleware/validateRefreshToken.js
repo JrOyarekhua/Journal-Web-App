@@ -4,6 +4,7 @@ configDotenv();
 const validateRefreshToken = (req, res, next) => {
   // get the refresh token from cookie
   const { refreshToken } = req.cookie;
+  console.log(refreshToken)
   if (!refreshToken) {
     return res.status(404).json({ message: "missing refresh token" });
   }

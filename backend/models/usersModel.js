@@ -79,15 +79,14 @@ export const validateId = async (user_id) => {
 
 export const insertNewUser = async (
   email,
-  username,
   password,
   first_name,
   last_name
 ) => {
   try {
     const result = await db.query(
-      "INSERT INTO users (email,username,first_name,last_name,password) VALUES ($1,$2,$3,$4,$5) RETURNING *;",
-      [email, username, first_name, last_name, password]
+      "INSERT INTO users (email,first_name,last_name,password) VALUES ($1,$2,$3,$4) RETURNING *;",
+      [email, first_name, last_name, password]
     );
     return result.rows[0];
   } catch (error) {

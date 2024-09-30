@@ -15,13 +15,15 @@ passport.use(
     // get user from the database
     try {
       console.log(jwt_payload);
-      const user = await getUserById(jwt_payload.id);
-      console.log(user);
+      const user = await getUserById(jwt_payload.user_id);
       if (!user) {
+        console.log("passport error: User ID not found")
         return done(null, false);
       }
+      console.log(user)
       return done(null, user);
     } catch (err) {
+      console.log("err " + err)
       return done(err, false);
     }
   })

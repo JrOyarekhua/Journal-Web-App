@@ -1,20 +1,21 @@
-import { getUserById } from "../models/usersModel.js";
-
+import { getNoteById } from "../models/notesModel.js";
 const verifyNoteAction = async (req, res, next) => {
-  const { userId, noteId } = req.params;
+  const { noteId } = req.params;
+  const user = req.user
+  
   try {
-    const user = await getUserById(userId);
     if (!user) {
       return res.status(404).json({ message: "user not found with ID" });
     }
     const note = await getNoteById(noteId);
+    console.log("note: " + note)
     if (!note) {
       return res.status(404).json({ message: "note not found with note ID" });
     }
-    if (note.user_id !== userId) {
+    if (note.user_id !== user.user_id) {
       return res
         .status(403)
-        .json({ message: "you do not have permission to delete this note" });
+        .json({ message: "you do not have permission to edit this note" });
     }
     next();
   } catch (error) {
